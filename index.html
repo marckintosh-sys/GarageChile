@@ -7,48 +7,49 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Azul rey y matices */
-  --bg:        #eef1f8;
+  /* Colores del logo GarageChile */
+  --bg:        #f0f2f8;
   --surface:   #ffffff;
-  --surface2:  #e0e6f5;
-  --border:    #b8c6e8;
-  --border2:   #d0daf2;
-  --navy:      #0d1e6b;   /* azul rey oscuro */
-  --blue:      #1a35c2;   /* azul rey puro */
-  --blue2:     #2545d4;   /* azul rey brillante */
-  --sky:       #4169e1;   /* royal blue clásico */
-  --sky-light: #dce5ff;   /* azul rey muy claro */
-  --accent:    #c0404a;   /* rojo suave/pastel */
-  --accent2:   #d4606a;   /* rojo pastel claro */
-  --text:      #080f2e;
-  --muted:     #4a5480;
-  --muted2:    #8892b8;
+  --surface2:  #e4e8f4;
+  --border:    #b0bcd8;
+  --border2:   #ccd4ec;
+  --navy:      #121e5e;
+  --blue:      #1a2a6e;
+  --blue2:     #253490;
+  --sky:       #3a50b8;
+  --sky-light: #dce3f8;
+  --accent:    #cc1a1a;
+  --accent2:   #e02a2a;
+  --text:      #0a1230;
+  --muted:     #3a4470;
+  --muted2:    #7a86b0;
   --green:     #05704a;
   --green-bg:  #d0f0e4;
-  --orange:    #b84050;   /* rojo rosado suave */
-  --orange-bg: #fde8ea;   /* fondo rojo pastel */
-  --red:       #c04555;
-  --red-bg:    #fdeaec;
+  --orange:    #b81c1c;
+  --orange-bg: #fde0e0;
+  --red:       #cc1a1a;
+  --red-bg:    #fde0e0;
   --white:     #ffffff;
-  --shadow:    0 1px 3px rgba(13,30,107,.09), 0 4px 16px rgba(13,30,107,.07);
-  --shadow-lg: 0 8px 32px rgba(13,30,107,.14);
+  --shadow:    0 1px 3px rgba(18,30,94,.09), 0 4px 16px rgba(18,30,94,.07);
+  --shadow-lg: 0 8px 32px rgba(18,30,94,.16);
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:var(--bg); color:var(--text); font-family:'Mulish',sans-serif; min-height:100vh; }
 
 body::before {
   content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background: linear-gradient(160deg, rgba(26,53,194,.06) 0%, transparent 50%),
-              radial-gradient(ellipse 70% 50% at 100% 0%, rgba(65,105,225,.07) 0%, transparent 60%);
+  background: linear-gradient(160deg, rgba(26,42,110,.06) 0%, transparent 50%),
+              radial-gradient(ellipse 70% 50% at 100% 0%, rgba(204,26,26,.04) 0%, transparent 60%);
 }
 
 /* ── CONFIG BANNER ── */
 #configBanner {
   background: var(--navy);
-  border-bottom: 3px solid var(--accent);
+  border-bottom: 3px solid #cc1a1a;
   padding: 14px 36px;
   display: flex; align-items: center; gap: 16px;
   position: relative; z-index: 30;
+  flex-wrap: wrap;
 }
 #configBanner.hidden { display: none; }
 .banner-text strong { color: var(--accent); display:block; font-size:.95rem; margin-bottom:2px; }
@@ -84,6 +85,7 @@ header {
   padding:0 36px; height:64px;
   display:flex; align-items:center; justify-content:space-between;
   box-shadow:0 2px 12px rgba(10,31,68,.25);
+  border-bottom:2px solid rgba(192,64,74,.5);
 }
 .logo {
   display:flex; align-items:center; gap:10px;
@@ -169,7 +171,7 @@ main { position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:32
 
 /* ── RESULT CARD ── */
 .vehicle-card { background:var(--white); border:1.5px solid var(--border2); border-radius:14px; overflow:hidden; transition:all .2s; margin-bottom:14px; box-shadow:var(--shadow); }
-.vehicle-card:hover { border-color:var(--blue); transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+.vehicle-card:hover { border-color:var(--blue); transform:translateY(-3px); box-shadow:0 12px 40px rgba(13,30,107,.18); }
 .card-header { display:flex; align-items:center; gap:18px; padding:18px 22px; border-bottom:1px solid var(--border2); }
 .car-photo-wrap { width:92px; height:68px; border-radius:10px; background:var(--surface2); border:1.5px dashed var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:.6rem; color:var(--muted2); gap:3px; overflow:hidden; cursor:pointer; transition:all .2s; flex-shrink:0; position:relative; }
 .car-photo-wrap:hover { border-color:var(--blue); color:var(--blue); background:var(--sky-light); }
@@ -227,7 +229,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
 .stat-card.green::after { background:var(--green); }
 .stat-card.orange::after { background:var(--orange); }
 .stat-card.red::after { background:var(--red); }
-.stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 36px rgba(13,30,107,.16); }
 .stat-card-label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); margin-bottom:8px; }
 .stat-card-value { font-family:'Barlow Condensed',sans-serif; font-size:2rem; font-weight:800; color:var(--navy); line-height:1; margin-bottom:3px; }
 .stat-card.green .stat-card-value { color:var(--green); }
@@ -292,15 +294,109 @@ tbody td { padding:10px 14px; vertical-align:middle; }
 .resumen-row { display:flex; align-items:center; gap:14px; padding:11px 4px; border-bottom:1px solid var(--border2); }
 .resumen-row:last-child { border-bottom:none; }
 
+/* ── MOBILE OPTIMIZADO ── */
 @media(max-width:768px) {
-  header { padding:0 16px; }
-  .filtros-grid { grid-template-columns:repeat(2,1fr); }
+  /* Header compacto */
+  header { padding:0 14px; height:56px; }
+  .logo { font-size:1.2rem; }
+  .logo-mark { width:30px; height:30px; font-size:.95rem; }
+  .conn-pill { padding:4px 9px; font-size:.7rem; }
+  .conn-pill span { display:none; }
+  nav button { padding:6px 10px; font-size:.8rem; }
+  nav button span { display:none; }
+
+  /* Main padding */
+  main { padding:16px 12px 100px; }
+
+  /* Ocultar page-head subtitulo */
+  .page-sub { display:none; }
+  .page-title { font-size:1.4rem; }
+
+  /* Search hero más compacto */
+  .search-hero { padding:16px; border-radius:12px; margin-bottom:16px; }
+  .search-input { font-size:1.1rem; padding:11px 14px 11px 40px; letter-spacing:2px; }
+  .search-row { gap:8px; }
+  .search-tags { display:none; }
+
+  /* Cards móvil */
+  .card-header { padding:14px 14px; gap:12px; }
+  .car-photo-wrap { width:72px; height:54px; }
+  .car-name { font-size:1.05rem; }
+  .car-plate { font-size:.8rem; padding:2px 8px; }
+  .card-meta { gap:8px; font-size:.75rem; }
   .card-body { grid-template-columns:repeat(2,1fr); }
-  .stats-row { grid-template-columns:repeat(2,1fr); }
-  .rc-grid { grid-template-columns:repeat(2,1fr); }
+  .card-stat { padding:10px 12px; }
+  .card-footer { padding:10px 14px; gap:6px; flex-wrap:wrap; }
+  .card-footer .btn-sm { flex:1; justify-content:center; font-size:.78rem; padding:8px 6px; }
+
+  /* Tabla → ocultar columnas menos importantes en móvil */
+  table thead th:nth-child(4),
+  table thead th:nth-child(6),
+  table thead th:nth-child(7),
+  table thead th:nth-child(10),
+  table thead th:nth-child(11) { display:none; }
+  table tbody td:nth-child(4),
+  table tbody td:nth-child(6),
+  table tbody td:nth-child(7),
+  table tbody td:nth-child(10),
+  table tbody td:nth-child(11) { display:none; }
+  .table-toolbar { padding:10px 12px; }
+  .toolbar-search { width:100%; }
+
+  /* Stats */
+  .stats-row { grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+  .stat-card { padding:14px 16px; }
+  .stat-card-value { font-size:1.6rem; }
+
+  /* Filtros */
+  .filtros-panel { padding:14px 14px; }
+  .filtros-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .filtros-title { font-size:.9rem; margin-bottom:10px; }
+
+  /* Form modal */
+  .modal { border-radius:14px 14px 0 0; max-height:95vh; margin-top:auto; width:100%; }
+  .modal-body { padding:16px; }
   .form-grid { grid-template-columns:1fr; }
   .form-grid.tri { grid-template-columns:1fr; }
-  nav button span { display:none; }
+  .form-actions { flex-wrap:wrap; }
+  .form-actions .btn { flex:1; justify-content:center; }
+
+  /* RC grid */
+  .rc-grid { grid-template-columns:repeat(2,1fr); }
+  .rc-result { padding:16px; }
+
+  /* Resumen */
+  .resumen-row { flex-wrap:wrap; gap:8px; }
+
+  /* Botón flotante agregar en móvil */
+  #btnAgregarMobile {
+    display:flex !important;
+    position:fixed; bottom:20px; right:20px;
+    width:56px; height:56px;
+    background:var(--blue); color:#fff;
+    border:none; border-radius:50%;
+    font-size:1.6rem; align-items:center; justify-content:center;
+    box-shadow:0 4px 20px rgba(26,53,194,.45);
+    cursor:pointer; z-index:100;
+    transition:all .2s;
+  }
+  #btnAgregarMobile:hover { background:var(--blue2); transform:scale(1.08); }
+
+  /* Toast más pequeño en móvil */
+  .toast { bottom:80px; right:12px; left:12px; max-width:100%; font-size:.82rem; }
+
+  /* Ocultar columna dueños y acciones en tabla móvil queda más limpia */
+  .actions-cell { gap:3px; }
+  .btn-icon { width:26px; height:26px; font-size:.75rem; }
+}
+
+@media(max-width:480px) {
+  .search-input { font-size:1rem; letter-spacing:1px; }
+  .filtros-grid { grid-template-columns:1fr 1fr; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .card-body { grid-template-columns:1fr 1fr; }
+  nav button { padding:5px 8px; font-size:.75rem; }
+  .page-head { margin-bottom:16px; }
 }
 </style>
 </head>
@@ -320,8 +416,10 @@ tbody td { padding:10px 14px; vertical-align:middle; }
 <!-- HEADER -->
 <header>
   <div class="logo">
-    <div class="logo-mark">G</div>
-    Garage<em>Chile</em>
+    <img src="logo.png" alt="GarageChile" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'"
+         style="height:46px;width:46px;object-fit:contain;border-radius:50%;border:2px solid rgba(255,255,255,.25);">
+    <div id="logoFallback" style="display:none;background:#cc1a1a;color:#fff;width:36px;height:36px;border-radius:8px;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:900">G</div>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:.5px">Garage<em style="color:#cc1a1a;font-style:normal">Chile</em></span>
   </div>
   <nav>
     <button class="active" onclick="switchTab('buscar',this)">🔍 <span>Buscar</span></button>
@@ -341,7 +439,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
   <div class="page-head">
     <div>
       <div class="page-title">Búsqueda de Vehículo</div>
-      <div class="page-sub">Busca por patente en tu inventario o consulta el Registro Civil de Chile</div>
+      <div class="page-sub">Busca por <strong>patente</strong> o <strong>marca</strong> en tu inventario</div>
     </div>
   </div>
 
@@ -349,7 +447,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
     <div class="search-row">
       <div class="input-wrap">
         <span class="search-icon">🔍</span>
-        <input class="search-input" type="text" id="searchInput" placeholder="Ej: ABCD-12" maxlength="8"
+        <input class="search-input" type="text" id="searchInput" placeholder="Patente o Marca: ABCD-12 / Toyota"
                oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')buscar()">
       </div>
       <button class="btn btn-accent" onclick="buscar()">Buscar</button>
@@ -374,14 +472,15 @@ tbody td { padding:10px 14px; vertical-align:middle; }
       <div class="page-title">Inventario de Vehículos</div>
       <div class="page-sub">Datos guardados en Google Sheets · 📷 para fotos en Google Drive</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-secondary btn-sm" onclick="exportarCSV()">⬇️ Exportar CSV</button>
-      <button class="btn btn-primary btn-sm" onclick="abrirFormNuevo()">+ Agregar Auto</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm" onclick="toggleFiltros()" id="btnFiltros">🎯 Filtros</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportarCSV()">⬇️ CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="abrirFormNuevo()">+ Agregar</button>
     </div>
   </div>
 
   <!-- FILTROS AVANZADOS -->
-  <div class="filtros-panel">
+  <div class="filtros-panel" id="filtrosPanel" style="display:none">
     <div class="filtros-title">🎯 Filtros Avanzados</div>
     <div class="filtros-grid">
       <div class="filtro-group">
@@ -572,6 +671,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
 </div>
 
 <div class="toast" id="toast"></div>
+<button id="btnAgregarMobile" style="display:none" onclick="abrirFormNuevo()">+</button>
 
 <script>
 // ══════════════════════════════════════════════
@@ -712,6 +812,18 @@ function norm(v) {
 // ══════════════════════════════════════════════
 //  FILTROS AVANZADOS
 // ══════════════════════════════════════════════
+function toggleFiltros() {
+  var panel = document.getElementById('filtrosPanel');
+  var btn   = document.getElementById('btnFiltros');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    btn.textContent = '✕ Cerrar filtros';
+  } else {
+    panel.style.display = 'none';
+    btn.textContent = '🎯 Filtros';
+  }
+}
+
 function aplicarFiltros() {
   const marca    = document.getElementById('fMarca').value.trim().toLowerCase();
   const anioMin  = parseInt(document.getElementById('fAnioMin').value)||0;
@@ -788,12 +900,16 @@ async function buscar() {
   const q = document.getElementById('searchInput').value.trim().toUpperCase();
   const container = document.getElementById('resultInventario');
   if (!q) { container.innerHTML=''; return; }
-  container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Inventario<span style="flex:1;height:1px;background:var(--border2)"></span></div>
+  container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Buscando...<span style="flex:1;height:1px;background:var(--border2)"></span></div>
     <div class="loading-row"><div class="spinner"></div> Buscando...</div>`;
 
+  // Busca por patente Y por marca/modelo
   let found = vehiculos.filter(row => {
     const v = norm(row);
-    return v.patente.replace('-','').includes(q.replace('-',''));
+    const matchPatente = v.patente.replace('-','').includes(q.replace('-',''));
+    const matchMarca   = v.marca.toUpperCase().includes(q);
+    const matchModelo  = v.modelo.toUpperCase().includes(q);
+    return matchPatente || matchMarca || matchModelo;
   });
 
   if (found.length===0 && SCRIPT_URL) {
@@ -802,14 +918,14 @@ async function buscar() {
   }
 
   if (!found.length) {
-    container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Inventario<span style="flex:1;height:1px;background:var(--border2)"></span></div>
+    container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Sin resultados<span style="flex:1;height:1px;background:var(--border2)"></span></div>
       <div class="vehicle-card" style="padding:36px;text-align:center;color:var(--muted)">
         <div style="font-size:2.5rem;margin-bottom:12px">🔎</div>
-        No hay ningún vehículo con la patente <strong style="color:var(--navy)">${q}</strong> en el inventario.
+        No hay vehículos con <strong style="color:var(--navy)">${q}</strong> en el inventario.
       </div>`;
     return;
   }
-  container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Encontrado en inventario (${found.length})<span style="flex:1;height:1px;background:var(--border2)"></span></div>`;
+  container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Encontrado (${found.length})<span style="flex:1;height:1px;background:var(--border2)"></span></div>`;
   found.forEach(row => container.insertAdjacentHTML('beforeend', buildCard(norm(row))));
 }
 
@@ -916,6 +1032,7 @@ function renderTabla(data) {
       <td><div class="actions-cell">
         <button class="btn btn-icon" onclick="abrirFotos('${v.id}')" title="Fotos">📷</button>
         <button class="btn btn-icon" onclick="abrirFormEditar('${v.id}')" title="Editar">✏️</button>
+        <button class="btn btn-icon" onclick="imprimirFicha('${v.id}')" title="Ficha PDF">🖨️</button>
       </div></td>
     </tr>`;
   }).join('');
@@ -1122,6 +1239,85 @@ function exportarCSV() {
   const blob=new Blob(['\uFEFF'+[cols.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='GarageChile_inventario.csv'; a.click();
   showToast('⬇️ Exportando CSV...', 'success');
+}
+
+// ══════════════════════════════════════════════
+//  FICHA PDF IMPRIMIBLE
+// ══════════════════════════════════════════════
+function imprimirFicha(id) {
+  const v = vehiculos.map(norm).find(x => String(x.id) === String(id));
+  if (!v) return;
+  const foto = v.fotos && v.fotos.length > 0
+    ? `<img src="${v.fotos[0]}" style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:16px">`
+    : `<div style="width:100%;height:120px;background:#e8eeff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin-bottom:16px">🚗</div>`;
+  const permExp = v.permiso && new Date(v.permiso) < new Date();
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html lang="es"><head>
+  <meta charset="UTF-8">
+  <title>Ficha — ${v.patente}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Mulish:wght@400;600&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Mulish',sans-serif; background:#fff; color:#080f2e; padding:32px; max-width:680px; margin:0 auto; }
+    .header { display:flex; align-items:center; gap:14px; margin-bottom:24px; padding-bottom:16px; border-bottom:3px solid #0d1e6b; }
+    .logo { background:#0d1e6b; color:#fff; width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:1.4rem; font-weight:900; }
+    .logo-text { font-family:'Barlow Condensed',sans-serif; font-size:1.4rem; font-weight:800; color:#1a2a6e; }
+    .logo-text em { color:#c0404a; font-style:normal; }
+    .fecha { margin-left:auto; font-size:.8rem; color:#8892b8; }
+    .plate { display:inline-block; background:#0d1e6b; color:#fff; font-family:'Barlow Condensed',sans-serif; font-size:1.8rem; font-weight:800; letter-spacing:4px; padding:6px 18px; border-radius:8px; margin-bottom:10px; }
+    .car-title { font-family:'Barlow Condensed',sans-serif; font-size:2rem; font-weight:800; color:#1a2a6e; margin-bottom:6px; }
+    .badge { display:inline-block; padding:4px 14px; border-radius:20px; font-size:.78rem; font-weight:700; letter-spacing:.5px; }
+    .badge-disponible { background:#d0f0e4; color:#05704a; }
+    .badge-reservado  { background:#fde8ea; color:#b84050; }
+    .badge-vendido    { background:#fdeaec; color:#c04555; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:18px 0; }
+    .field { background:#f0f4fb; border-radius:8px; padding:12px 14px; border-left:3px solid #0d1e6b; }
+    .field-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.8px; color:#8892b8; margin-bottom:3px; font-weight:700; }
+    .field-value { font-size:.95rem; font-weight:600; color:#080f2e; }
+    .field-value.price { color:#1a35c2; font-family:'Barlow Condensed',sans-serif; font-size:1.2rem; font-weight:800; }
+    .field-value.warn  { color:#c04555; }
+    .obs { background:#f0f4fb; border-radius:8px; padding:14px; margin-top:4px; border-left:3px solid #4169e1; }
+    .obs-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.8px; color:#8892b8; margin-bottom:5px; font-weight:700; }
+    .footer { margin-top:28px; padding-top:14px; border-top:1px solid #d0daf2; display:flex; justify-content:space-between; font-size:.75rem; color:#8892b8; }
+    @media print { body { padding:16px; } button { display:none; } }
+  </style>
+  </head><body>
+  <div class="header">
+    <img src="logo.png" onerror="this.outerHTML='<div style=&quot;background:#1a2a6e;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.2rem&quot;>G</div>'" style="width:44px;height:44px;object-fit:contain;border-radius:50%">
+    <div class="logo-text">Garage<em>Chile</em></div>
+    <div class="fecha">Ficha generada: ${new Date().toLocaleDateString('es-CL')}</div>
+  </div>
+  ${foto}
+  <div class="plate">${v.patente}</div>
+  <div class="car-title">${v.marca} ${v.modelo} ${v.anio}</div>
+  <span class="badge badge-${(v.estado||'').toLowerCase()}">${v.estado}</span>
+  <div class="grid">
+    <div class="field"><div class="field-label">Kilometraje</div><div class="field-value">${Number(v.km).toLocaleString('es-CL')} km</div></div>
+    <div class="field"><div class="field-label">Precio Venta</div><div class="field-value price">$${Number(v.precioVenta).toLocaleString('es-CL')}</div></div>
+    <div class="field"><div class="field-label">Combustible</div><div class="field-value">${v.combustible}</div></div>
+    <div class="field"><div class="field-label">Transmisión</div><div class="field-value">${v.transmision}</div></div>
+    <div class="field"><div class="field-label">N° Dueños</div><div class="field-value">${v.duenos}</div></div>
+    <div class="field"><div class="field-label">Fecha Ingreso</div><div class="field-value">${v.ingreso||'—'}</div></div>
+    <div class="field"><div class="field-label">Propietario Anterior</div><div class="field-value">${v.propietario||'—'}</div></div>
+    <div class="field"><div class="field-label">Vendedor</div><div class="field-value">${v.vendedor||'—'}</div></div>
+    <div class="field" style="border-color:${permExp?'#c04555':'#4169e1'}">
+      <div class="field-label">Permiso Circulación</div>
+      <div class="field-value${permExp?' warn':''}">
+        ${v.permiso||'—'} ${permExp?'⚠️ VENCIDO':''}
+      </div>
+    </div>
+    ${v.venta?`<div class="field"><div class="field-label">Fecha Venta</div><div class="field-value">${v.venta}</div></div>`:''}
+  </div>
+  ${v.obs?`<div class="obs"><div class="obs-label">Observaciones</div><div style="font-size:.9rem;color:#080f2e;line-height:1.5">${v.obs}</div></div>`:''}
+  <div class="footer">
+    <span>GarageChile — Liquidadora de Vehículos</span>
+    <span>Ficha N° ${v.id}</span>
+  </div>
+  <div style="margin-top:20px;text-align:center">
+    <button onclick="window.print()" style="background:#0d1e6b;color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer">🖨️ Imprimir / Guardar PDF</button>
+  </div>
+  </body></html>`);
+  win.document.close();
 }
 
 // ══════════════════════════════════════════════
