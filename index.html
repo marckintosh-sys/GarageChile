@@ -313,8 +313,8 @@ tbody td { padding:10px 14px; vertical-align:middle; }
   .page-title { font-size:1.4rem; }
 
   /* Search hero más compacto */
-  .search-hero { padding:16px; border-radius:12px; margin-bottom:16px; }
-  .search-input { font-size:1.1rem; padding:11px 14px 11px 40px; letter-spacing:2px; }
+  .search-hero { padding:18px 16px; border-radius:12px; margin-bottom:16px; }
+  .search-input { font-size:1.25rem; padding:14px 16px 14px 44px; letter-spacing:2px; height:56px; }
   .search-row { gap:8px; }
   .search-tags { display:none; }
 
@@ -602,6 +602,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
         <div class="form-group"><label>Modelo *</label><input id="fModelo" type="text" placeholder="Corolla"></div>
         <div class="form-group"><label>Año</label><input id="fAnio" type="number" placeholder="2020" min="1990" max="2030"></div>
         <div class="form-group"><label>Kilometraje</label><input id="fKm" type="number" placeholder="50000"></div>
+        <div class="form-group"><label>Cilindrada (cc)</label><input id="fCilindrada" type="text" placeholder="1600cc / 2000cc"></div>
       </div>
       <div class="form-grid tri">
         <div class="form-group"><label>Combustible</label>
@@ -618,11 +619,13 @@ tbody td { padding:10px 14px; vertical-align:middle; }
       <div class="form-section">Documentación</div>
       <div class="form-grid">
         <div class="form-group"><label>Vencimiento Permiso Circ.</label><input id="fPermiso" type="date"></div>
+        <div class="form-group"><label>Vencimiento Revisión Técnica</label><input id="fRevTecnica" type="date"></div>
       </div>
 
       <div class="form-section">Precios y Estado</div>
       <div class="form-grid tri">
         <div class="form-group"><label>Precio Venta ($)</label><input id="fPrecioVenta" type="number" placeholder="13000"></div>
+        <div class="form-group"><label>Valor Permuta ($)</label><input id="fPermuta" type="number" placeholder="0"></div>
         <div class="form-group"><label>Estado</label>
           <select id="fEstado"><option>Disponible</option><option>Reservado</option><option>Vendido</option></select>
         </div>
@@ -786,6 +789,13 @@ function switchTab(name, btn) {
 // ══════════════════════════════════════════════
 //  NORMALIZAR ROW
 // ══════════════════════════════════════════════
+function fmtFecha(val) {
+  if (!val) return '';
+  const s = String(val);
+  // Si viene con T (ISO format) extraer solo la fecha
+  if (s.includes('T')) return s.split('T')[0];
+  return s;
+}
 function norm(v) {
   return {
     id:          v.ID||v.id,
@@ -797,14 +807,17 @@ function norm(v) {
     combustible: v.Combustible||v.combustible||'',
     transmision: v.Transmision||v.transmision||'',
     duenos:      v.Duenos||v.duenos||1,
-    permiso:     v.Permiso||v.permiso||'',
+    permiso:     fmtFecha(v.Permiso||v.permiso||''),
     precioVenta: v.PrecioVenta||v.precioVenta||0,
     estado:      v.Estado||v.estado||'',
     propietario: v.Propietario||v.propietario||'',
     vendedor:    v.Vendedor||v.vendedor||'',
-    ingreso:     v.Ingreso||v.ingreso||'',
-    venta:       v.FechaVenta||v.venta||'',
+    ingreso:     fmtFecha(v.Ingreso||v.ingreso||''),
+    venta:       fmtFecha(v.FechaVenta||v.venta||''),
     obs:         v.Observaciones||v.obs||'',
+    revtecnica:  fmtFecha(v.RevTecnica||v.revtecnica||''),
+    cilindrada:  v.Cilindrada||v.cilindrada||'',
+    permuta:     v.Permuta||v.permuta||0,
     fotos:       v.fotos||[]
   };
 }
@@ -953,7 +966,10 @@ function buildCard(v) {
     <div class="card-body">
       <div class="card-stat"><div class="stat-label">Kilometraje</div><div class="stat-value">${Number(v.km).toLocaleString('es-CL')} km</div></div>
       <div class="card-stat"><div class="stat-label">Precio Venta</div><div class="stat-value price">$${Number(v.precioVenta).toLocaleString('es-CL')}</div></div>
+      ${v.permuta>0?`<div class="card-stat"><div class="stat-label">Valor Permuta</div><div class="stat-value" style="color:var(--green)">$${Number(v.permuta).toLocaleString('es-CL')}</div></div>`:''}
       <div class="card-stat"><div class="stat-label">Permiso Circ.</div><div class="stat-value" style="${permBg}">${v.permiso||'—'}</div></div>
+      ${v.revtecnica?`<div class="card-stat"><div class="stat-label">Rev. Técnica</div><div class="stat-value" style="${v.revtecnica && new Date(v.revtecnica)<new Date()?'color:var(--red);font-weight:700':''}">${v.revtecnica} ${v.revtecnica && new Date(v.revtecnica)<new Date()?'⚠️':''}</div></div>`:''}
+      ${v.cilindrada?`<div class="card-stat"><div class="stat-label">Cilindrada</div><div class="stat-value">${v.cilindrada}</div></div>`:''}
       <div class="card-stat"><div class="stat-label">Vendedor</div><div class="stat-value">${v.vendedor}</div></div>
     </div>
     ${v.obs ? `<div style="padding:10px 22px;background:var(--sky-light);border-top:1px solid var(--border2);font-size:.83rem;color:var(--muted);display:flex;gap:8px;align-items:flex-start"><span style="font-weight:700;color:var(--blue);white-space:nowrap">📝 Obs:</span><span>${v.obs}</span></div>` : ''}
@@ -1050,6 +1066,9 @@ function abrirFormNuevo() {
   document.getElementById('fIngreso').value=new Date().toISOString().split('T')[0];
   document.getElementById('fVenta').value='';
   document.getElementById('fPermiso').value='';
+  document.getElementById('fRevTecnica').value='';
+  document.getElementById('fCilindrada').value='';
+  document.getElementById('fPermuta').value='';
   document.getElementById('formModal').classList.add('open');
 }
 
@@ -1074,6 +1093,9 @@ function abrirFormEditar(id) {
   document.getElementById('fPropietario').value=v.propietario;
   document.getElementById('fVendedor').value=v.vendedor;
   document.getElementById('fObs').value=v.obs;
+  document.getElementById('fRevTecnica').value=v.revtecnica;
+  document.getElementById('fCilindrada').value=v.cilindrada;
+  document.getElementById('fPermuta').value=v.permuta;
   document.getElementById('formDeleteBtn').style.display='flex';
   document.getElementById('formModal').classList.add('open');
 }
@@ -1096,7 +1118,10 @@ async function guardarVehiculo() {
     vendedor:document.getElementById('fVendedor').value,
     ingreso:document.getElementById('fIngreso').value,
     venta:document.getElementById('fVenta').value,
-    obs:document.getElementById('fObs').value
+    obs:document.getElementById('fObs').value,
+    revtecnica:document.getElementById('fRevTecnica').value,
+    cilindrada:document.getElementById('fCilindrada').value,
+    permuta:document.getElementById('fPermuta').value
   };
   if (!v.patente||!v.marca||!v.modelo) { showToast('Patente, marca y modelo son obligatorios', 'error'); return; }
 
@@ -1154,7 +1179,23 @@ function cerrarPhotoModal() { document.getElementById('photoModal').classList.re
 function handleFiles(files) {
   Array.from(files).forEach(file => {
     const r = new FileReader();
-    r.onload = e => { tempFotos.push({src:e.target.result,file,fromDrive:false}); renderPhotoGrid(); };
+    r.onload = e => {
+      // Comprimir imagen antes de subir
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
+        tempFotos.push({src:compressed, file, fromDrive:false});
+        renderPhotoGrid();
+      };
+      img.src = e.target.result;
+    };
     r.readAsDataURL(file);
   });
 }
