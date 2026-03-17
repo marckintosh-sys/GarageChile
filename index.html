@@ -169,6 +169,17 @@ main { position:relative; z-index:1; max-width:1280px; margin:0 auto; padding:32
 .filtro-tag button { background:none; border:none; color:var(--blue); cursor:pointer; font-size:.8rem; line-height:1; padding:0 2px; }
 #filtros-activos { margin-bottom:12px; min-height:0; }
 
+/* ── FILTRO ESTADO RÁPIDO ── */
+.btn-estado-filter {
+  padding:5px 12px; border-radius:20px; font-size:.78rem; font-weight:700;
+  cursor:pointer; border:1.5px solid var(--border); background:var(--white);
+  color:var(--muted); transition:all .15s; font-family:'Mulish',sans-serif;
+}
+.btn-estado-filter.active      { background:var(--navy);  color:#fff; border-color:var(--navy); }
+.btn-estado-filter.disponible:hover, .btn-estado-filter.disponible.active { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-estado-filter.reservado:hover,  .btn-estado-filter.reservado.active  { background:var(--orange); color:#fff; border-color:var(--orange); }
+.btn-estado-filter.vendido:hover,    .btn-estado-filter.vendido.active    { background:var(--red); color:#fff; border-color:var(--red); }
+
 /* ── RESULT CARD ── */
 .vehicle-card { background:var(--white); border:1.5px solid var(--border2); border-radius:14px; overflow:hidden; transition:all .2s; margin-bottom:14px; box-shadow:var(--shadow); }
 .vehicle-card:hover { border-color:var(--blue); transform:translateY(-3px); box-shadow:0 12px 40px rgba(13,30,107,.18); }
@@ -333,13 +344,17 @@ tbody td { padding:10px 14px; vertical-align:middle; }
   table thead th:nth-child(4),
   table thead th:nth-child(6),
   table thead th:nth-child(7),
-  table thead th:nth-child(10),
-  table thead th:nth-child(11) { display:none; }
+  table thead th:nth-child(8),
+  table thead th:nth-child(12),
+  table thead th:nth-child(13),
+  table thead th:nth-child(14) { display:none; }
   table tbody td:nth-child(4),
   table tbody td:nth-child(6),
   table tbody td:nth-child(7),
-  table tbody td:nth-child(10),
-  table tbody td:nth-child(11) { display:none; }
+  table tbody td:nth-child(8),
+  table tbody td:nth-child(12),
+  table tbody td:nth-child(13),
+  table tbody td:nth-child(14) { display:none; }
   .table-toolbar { padding:10px 12px; }
   .toolbar-search { width:100%; }
 
@@ -439,7 +454,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
   <div class="page-head">
     <div>
       <div class="page-title">Búsqueda de Vehículo</div>
-      <div class="page-sub">Busca por <strong>patente</strong> o <strong>marca</strong> en tu inventario</div>
+      <div class="page-sub">Busca por patente, marca, modelo, año, vendedor y más</div>
     </div>
   </div>
 
@@ -447,7 +462,7 @@ tbody td { padding:10px 14px; vertical-align:middle; }
     <div class="search-row">
       <div class="input-wrap">
         <span class="search-icon">🔍</span>
-        <input class="search-input" type="text" id="searchInput" placeholder="Patente o Marca: ABCD-12 / Toyota"
+        <input class="search-input" type="text" id="searchInput" placeholder="Patente, marca, modelo, año, vendedor..."
                oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')buscar()">
       </div>
       <button class="btn" style="background:#fff;color:var(--navy);font-weight:800;border:none" onclick="buscar()">Buscar</button>
@@ -545,18 +560,24 @@ tbody td { padding:10px 14px; vertical-align:middle; }
       <div class="search-wrap">
         <input class="toolbar-search" type="text" placeholder="Búsqueda rápida..." oninput="filtroRapido(this.value)">
       </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-estado-filter active" id="feTodos"     onclick="filtrarEstado('todos',this)">🚗 Todos</button>
+        <button class="btn-estado-filter disponible" id="feDisp"  onclick="filtrarEstado('Disponible',this)">✅ Disponibles</button>
+        <button class="btn-estado-filter reservado"  id="feRes"   onclick="filtrarEstado('Reservado',this)">🔶 Reservados</button>
+        <button class="btn-estado-filter vendido"    id="feVend"  onclick="filtrarEstado('Vendido',this)">🏁 Vendidos</button>
+      </div>
       <div style="font-size:.8rem;color:var(--muted)" id="countLabel">— vehículos</div>
     </div>
     <div style="overflow-x:auto">
       <table>
         <thead><tr>
           <th>Foto</th><th>Patente</th><th>Marca / Modelo</th><th>Año</th>
-          <th>Km</th><th>Transmisión</th><th>Combustible</th>
+          <th>Km</th><th>Cilindrada</th><th>Transmisión</th><th>Combustible</th>
           <th>Precio Venta</th><th>Estado</th>
-          <th>Perm. Circ.</th><th>Vendedor</th><th>Observaciones</th><th>Acciones</th>
+          <th>Perm. Circ.</th><th>Rev. Técnica</th><th>Vendedor</th><th>Observaciones</th><th>Acciones</th>
         </tr></thead>
         <tbody id="inventarioBody">
-          <tr><td colspan="12" class="loading-row"><div class="spinner"></div> Cargando...</td></tr>
+          <tr><td colspan="15" class="loading-row"><div class="spinner"></div> Cargando...</td></tr>
         </tbody>
       </table>
     </div>
@@ -816,8 +837,8 @@ function norm(v) {
     venta:       fmtFecha(v.FechaVenta||v.venta||''),
     obs:         v.Observaciones||v.obs||'',
     revtecnica:  fmtFecha(v.RevTecnica||v.revtecnica||''),
-    cilindrada:  v.Cilindrada||v.cilindrada||'',
-    permuta:     v.Permuta||v.permuta||0,
+    cilindrada:  String(v.Cilindrada||v.cilindrada||''),
+    permuta:     Number(v.Permuta||v.permuta||0),
     fotos:       v.fotos||[]
   };
 }
@@ -825,6 +846,30 @@ function norm(v) {
 // ══════════════════════════════════════════════
 //  FILTROS AVANZADOS
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  FILTRO RÁPIDO POR ESTADO
+// ══════════════════════════════════════════════
+function filtrarEstado(estado, btn) {
+  // Quitar active de todos los botones
+  ['feTodos','feDisp','feRes','feVend'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+
+  if (estado === 'todos') {
+    vehiculosFiltrados = [...vehiculos];
+  } else {
+    vehiculosFiltrados = vehiculos.filter(row => {
+      const v = norm(row);
+      return v.estado === estado;
+    });
+  }
+  renderTabla(vehiculosFiltrados);
+  const total = vehiculosFiltrados.length;
+  showToast(`${total} vehículo(s) ${estado === 'todos' ? 'en total' : estado.toLowerCase()+'(s)'}`, 'success');
+}
+
 function toggleFiltros() {
   var panel = document.getElementById('filtrosPanel');
   var btn   = document.getElementById('btnFiltros');
@@ -916,13 +961,22 @@ async function buscar() {
   container.innerHTML = `<div style="font-size:.73rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px">Buscando...<span style="flex:1;height:1px;background:var(--border2)"></span></div>
     <div class="loading-row"><div class="spinner"></div> Buscando...</div>`;
 
-  // Busca por patente Y por marca/modelo
+  // Busca por patente, marca, modelo, año, vendedor, combustible, transmisión, estado
   let found = vehiculos.filter(row => {
     const v = norm(row);
-    const matchPatente = v.patente.replace('-','').includes(q.replace('-',''));
-    const matchMarca   = v.marca.toUpperCase().includes(q);
-    const matchModelo  = v.modelo.toUpperCase().includes(q);
-    return matchPatente || matchMarca || matchModelo;
+    return [
+      v.patente.replace('-',''),
+      v.marca,
+      v.modelo,
+      String(v.anio),
+      v.vendedor,
+      v.combustible,
+      v.transmision,
+      v.estado,
+      v.propietario,
+      v.obs,
+      v.cilindrada||''
+    ].some(f => (f||'').toUpperCase().includes(q.replace('-','')));
   });
 
   if (found.length===0 && SCRIPT_URL) {
@@ -1027,7 +1081,7 @@ function renderTabla(data) {
   const body = document.getElementById('inventarioBody');
   document.getElementById('countLabel').textContent = `${rows.length} vehículo(s)`;
   if (!rows.length) {
-    body.innerHTML=`<tr><td colspan="12" class="empty-state"><div style="font-size:2.5rem;margin-bottom:10px">🚗</div>No hay vehículos. Ajusta los filtros o agrega el primero.</td></tr>`;
+    body.innerHTML=`<tr><td colspan="15" class="empty-state"><div style="font-size:2.5rem;margin-bottom:10px">🚗</div>No hay vehículos. Ajusta los filtros o agrega el primero.</td></tr>`;
     return;
   }
   const est = { Disponible:'status-disponible', Reservado:'status-reservado', Vendido:'status-vendido' };
@@ -1040,6 +1094,7 @@ function renderTabla(data) {
       <td><strong>${v.marca}</strong> ${v.modelo}</td>
       <td>${v.anio}</td>
       <td>${Number(v.km).toLocaleString('es-CL')} km</td>
+      <td>${v.cilindrada||'—'}</td>
       <td>${v.transmision}</td>
       <td>${v.combustible}</td>
       <td class="td-price">$${Number(v.precioVenta).toLocaleString('es-CL')}</td>
@@ -1217,17 +1272,52 @@ async function guardarFotos() {
   const nuevas = tempFotos.filter(f=>!f.fromDrive);
   if (!nuevas.length) { cerrarPhotoModal(); return; }
   if (!SCRIPT_URL) { showToast('Conecta Google Sheets para subir fotos a Drive', 'error'); return; }
-  document.getElementById('btnGuardarFotos').textContent='⬆️ Subiendo...';
-  document.getElementById('btnGuardarFotos').disabled=true;
+  const btn = document.getElementById('btnGuardarFotos');
+  btn.textContent='⬆️ Subiendo...'; btn.disabled=true;
   let ok=0;
   for (const f of nuevas) {
-    const res = await apiPost({ accion:'subirFoto', id:currentId, nombre:f.file?.name||`foto_${Date.now()}.jpg`, base64:f.src, tipo:f.file?.type||'image/jpeg' });
-    if (res&&res.ok) ok++;
+    try {
+      // Comprimir más para que quepa en POST
+      const b64 = await comprimirFoto(f.src, 800, 0.6);
+      const nombre = f.file?.name || `foto_${Date.now()}.jpg`;
+      const tipo   = f.file?.type || 'image/jpeg';
+      // Enviar como POST con form-urlencoded para evitar CORS preflight
+      const body = `accion=subirFoto&id=${encodeURIComponent(currentId)}&nombre=${encodeURIComponent(nombre)}&tipo=${encodeURIComponent(tipo)}&base64=${encodeURIComponent(b64)}`;
+      const r = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body
+      });
+      const data = await r.json();
+      if (data && data.ok) ok++;
+    } catch(e) {
+      console.error('Error subiendo foto:', e);
+    }
   }
-  document.getElementById('btnGuardarFotos').textContent='⬆️ Subir a Google Drive';
-  document.getElementById('btnGuardarFotos').disabled=false;
-  showToast(`✔ ${ok} foto(s) subidas a Google Drive`, 'success');
-  cerrarPhotoModal();
+  btn.textContent='⬆️ Subir a Google Drive'; btn.disabled=false;
+  if (ok > 0) {
+    showToast(`✔ ${ok} foto(s) subidas a Google Drive`, 'success');
+    cerrarPhotoModal();
+    await init();
+  } else {
+    showToast('Error al subir fotos. Verifica la conexión.', 'error');
+  }
+}
+
+function comprimirFoto(src, maxSize, calidad) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > maxSize) { h = Math.round(h * maxSize / w); w = maxSize; }
+      if (h > maxSize) { w = Math.round(w * maxSize / h); h = maxSize; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', calidad));
+    };
+    img.src = src;
+  });
 }
 
 const dz = document.getElementById('dropZone');
