@@ -1239,11 +1239,8 @@ function gcFmtFecha(str) {
   const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${y}`;
 }
-async function gcGenerarContrato() {
+function gcGenerarContrato() {
   const status = document.getElementById('gc_status');
-  status.textContent = 'Generando documento...';
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-          AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign } = docx;
   const g = id => document.getElementById(id).value.trim();
   const vn=g('gc_v_nombre'), vr=g('gc_v_rut'), vd=g('gc_v_dir');
   const cn=g('gc_c_nombre'), cr=g('gc_c_rut'), cd=g('gc_c_dir'), ct=g('gc_c_tel');
@@ -1259,75 +1256,173 @@ async function gcGenerarContrato() {
   }
   const today=new Date();
   const todayStr=gcFmtFecha(today.toISOString().split('T')[0]);
-  const b1={style:BorderStyle.SINGLE,size:1,color:'AAAAAA'};
-  const brd={top:b1,bottom:b1,left:b1,right:b1};
-  const nb={style:BorderStyle.NONE,size:0,color:'FFFFFF'};
-  const noBrd={top:nb,bottom:nb,left:nb,right:nb};
-  const lbl=t=>new TableCell({borders:brd,width:{size:3200,type:WidthType.DXA},shading:{fill:'E8F0F7',type:ShadingType.CLEAR},verticalAlign:VerticalAlign.CENTER,margins:{top:100,bottom:100,left:150,right:150},children:[new Paragraph({children:[new TextRun({text:t,bold:true,size:20,font:'Arial'})]})]});
-  const val=t=>new TableCell({borders:brd,width:{size:6160,type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,margins:{top:100,bottom:100,left:150,right:150},children:[new Paragraph({children:[new TextRun({text:t,size:20,font:'Arial'})]})]});
-  const row=(l,v)=>new Table({width:{size:9360,type:WidthType.DXA},columnWidths:[3200,6160],rows:[new TableRow({children:[lbl(l),val(v)]})]});
-  const sec=t=>new Paragraph({spacing:{before:280,after:120},children:[new TextRun({text:t,bold:true,size:22,font:'Arial',color:'1B4F72'})],border:{bottom:{style:BorderStyle.SINGLE,size:6,color:'1B4F72',space:1}}});
-  const sp=()=>new Paragraph({spacing:{before:100,after:0},children:[new TextRun('')]});
-  const cl=(n,ti,tx)=>new Paragraph({alignment:AlignmentType.JUSTIFIED,spacing:{before:80,after:120},children:[new TextRun({text:n+'. ',bold:true,size:20,font:'Arial'}),new TextRun({text:ti+': ',bold:true,size:20,font:'Arial'}),new TextRun({text:tx,size:20,font:'Arial'})]});
-  const document2=new Document({
-    styles:{default:{document:{run:{font:'Arial',size:20}}}},
-    sections:[{
-      properties:{page:{size:{width:12240,height:15840},margin:{top:1200,right:1200,bottom:1200,left:1200}}},
-      children:[
-        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:60},children:[new TextRun({text:'CONTRATO DE RESERVA Y COMPROMISO DE COMPRAVENTA',bold:true,size:26,font:'Arial',color:'1B4F72'})]}),
-        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:60},children:[new TextRun({text:'DE VEHÍCULO MOTORIZADO',bold:true,size:24,font:'Arial',color:'1B4F72'})]}),
-        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:60,after:320},children:[new TextRun({text:`Santiago, ${todayStr}`,size:20,font:'Arial',color:'555555',italics:true})]}),
-        new Paragraph({alignment:AlignmentType.JUSTIFIED,spacing:{before:0,after:240},children:[new TextRun({text:`En la ciudad de Santiago, a ${todayStr}, las partes que se individualizan a continuación han convenido el presente contrato de reserva y compromiso de compraventa, sujeto a las siguientes condiciones:`,size:20,font:'Arial'})]}),
-        sec('I. DATOS DEL VENDEDOR'),sp(),
-        row('Razón Social:',vn),row('RUT:',vr),row('Dirección:',vd),sp(),
-        sec('II. DATOS DEL COMPRADOR'),sp(),
-        row('Nombre Completo:',cn),row('RUT:',cr),row('Dirección:',cd),row('Teléfono:',ct),sp(),
-        sec('III. ANTECEDENTES DEL VEHÍCULO'),sp(),
-        row('Marca:',marca),row('Modelo:',modelo+(anio?' — Año '+anio:'')),row('Patente:',patente),row('Color:',color),row('Kilometraje:',km),sp(),
-        sec('IV. CONDICIONES ECONÓMICAS'),sp(),
-        row('Precio Total de Venta:',`${gcFmt(total)} (${gcFmtLetras(total)} de pesos)`),
-        row('Monto de Reserva:',`${gcFmt(reserva)} (${gcFmtLetras(reserva)} de pesos)`),
-        row('Saldo a Pagar:',`${gcFmt(saldo)} (${gcFmtLetras(saldo)} de pesos)`),
-        row('Plazo para Concretar:',plazoStr),sp(),
-        sec('V. CLÁUSULAS Y CONDICIONES'),sp(),
-        cl('1','RESERVA',`El comprador entrega en este acto la suma de ${gcFmt(reserva)} (${gcFmtLetras(reserva)} de pesos) como reserva del vehículo individualizado en la cláusula III, obligándose el vendedor a no ofrecer ni vender dicho vehículo a terceros durante el plazo estipulado.`),
-        cl('2','PLAZO',`Las partes acuerdan que la compraventa deberá perfeccionarse a más tardar el día ${plazoStr}, fecha en la cual el comprador deberá pagar el saldo de ${gcFmt(saldo)} (${gcFmtLetras(saldo)} de pesos).`),
-        cl('3','INCUMPLIMIENTO DEL COMPRADOR','Si el comprador no cumpliere con el pago del saldo dentro del plazo establecido, sin causa justificada, el vendedor podrá dejar sin efecto el presente contrato, reteniendo el monto de reserva en calidad de indemnización de perjuicios.'),
-        cl('4','INCUMPLIMIENTO DEL VENDEDOR','Si el vendedor no cumpliere con la entrega del vehículo en las condiciones y plazo pactados, deberá restituir al comprador el doble del monto de reserva recibido, como indemnización por los perjuicios causados.'),
-        cl('5','ESTADO DEL VEHÍCULO','El vendedor declara que el vehículo se encuentra en buen estado de funcionamiento, libre de gravámenes, prohibiciones, prendas, embargos y cualquier otro impedimento legal que afecte su libre transferencia.'),
-        cl('6','RESOLUCIÓN DE CONFLICTOS','Para todos los efectos legales derivados del presente contrato, las partes fijan domicilio en la ciudad de Santiago y se someten a la competencia de sus Tribunales de Justicia.'),
-        sp(),sp(),
-        sec('VI. FIRMAS'),sp(),sp(),
-        new Table({
-          width:{size:9360,type:WidthType.DXA},columnWidths:[4400,560,4400],
-          rows:[new TableRow({children:[
-            new TableCell({borders:noBrd,width:{size:4400,type:WidthType.DXA},margins:{top:0,bottom:0,left:0,right:0},children:[
-              new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:4,color:'333333'}},spacing:{before:120,after:60},children:[new TextRun({text:vn,bold:true,size:18,font:'Arial'})]}),
-              new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:0},children:[new TextRun({text:'RUT: '+vr,size:18,font:'Arial'})]}),
-              new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:0},children:[new TextRun({text:'VENDEDOR',bold:true,size:18,font:'Arial',color:'1B4F72'})]}),
-            ]}),
-            new TableCell({borders:noBrd,width:{size:560,type:WidthType.DXA},children:[new Paragraph({children:[new TextRun('')]})] }),
-            new TableCell({borders:noBrd,width:{size:4400,type:WidthType.DXA},margins:{top:0,bottom:0,left:0,right:0},children:[
-              new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:4,color:'333333'}},spacing:{before:120,after:60},children:[new TextRun({text:cn,bold:true,size:18,font:'Arial'})]}),
-              new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:0},children:[new TextRun({text:'RUT: '+cr,size:18,font:'Arial'})]}),
-              new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:0,after:0},children:[new TextRun({text:'COMPRADOR',bold:true,size:18,font:'Arial',color:'1B4F72'})]}),
-            ]}),
-          ]})]
-        }),
-        sp(),sp(),
-        new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:2,color:'CCCCCC'}},spacing:{before:200,after:0},children:[new TextRun({text:`Documento generado el ${todayStr}  |  ${vn}  |  ${vd}`,size:16,font:'Arial',color:'888888'})]}),
-      ]
-    }]
-  });
-  const buf=await Packer.toBuffer(document2);
-  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download=`Contrato_${cn.split(' ')[0]}_${marca}_${modelo}.docx`; a.click();
-  URL.revokeObjectURL(url);
-  status.textContent='✅ Contrato descargado correctamente.';
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function par(txt,opts){
+    opts=opts||{};
+    const jc=opts.center?'center':opts.right?'right':'both';
+    const spB=opts.spB||0, spA=opts.spA||0;
+    const rPr=(opts.bold?'<w:b/>':'')+(opts.italic?'<w:i/>':'')+'<w:sz w:val="'+(opts.sz||20)+'"/><w:szCs w:val="'+(opts.sz||20)+'"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>'+(opts.color?'<w:color w:val="'+opts.color+'"/>':"");
+    const bdr=opts.bdrBottom?'<w:pBdr><w:bottom w:val="single" w:sz="6" w:space="1" w:color="1B4F72"/></w:pBdr>':'';
+    return '<w:p><w:pPr><w:jc w:val="'+jc+'"/><w:spacing w:before="'+spB+'" w:after="'+spA+'"/><w:rPr>'+rPr+'</w:rPr>'+bdr+'</w:pPr><w:r><w:rPr>'+rPr+'</w:rPr><w:t xml:space="preserve">'+esc(txt)+'</w:t></w:r></w:p>';
+  }
+  function parMulti(runs,opts){
+    opts=opts||{};
+    const jc=opts.center?'center':opts.right?'right':'both';
+    const spB=opts.spB||80, spA=opts.spA||120;
+    let rs='';
+    runs.forEach(function(r){
+      const rPr=(r.bold?'<w:b/>':'')+'<w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/>';
+      rs+='<w:r><w:rPr>'+rPr+'</w:rPr><w:t xml:space="preserve">'+esc(r.text)+'</w:t></w:r>';
+    });
+    return '<w:p><w:pPr><w:jc w:val="'+jc+'"/><w:spacing w:before="'+spB+'" w:after="'+spA+'"/></w:pPr>'+rs+'</w:p>';
+  }
+  function sec(title){
+    return par(title,{bold:true,sz:22,color:'1B4F72',bdrBottom:true,spB:280,spA:120,jc:'left'});
+  }
+  function sp(){ return '<w:p><w:pPr><w:spacing w:before="100" w:after="0"/></w:pPr></w:p>'; }
+  function trow(label,value){
+    return '<w:tr>'+
+      '<w:tc><w:tcPr><w:tcW w:w="3200" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="E8F0F7"/><w:tcBorders><w:top w:val="single" w:sz="2" w:color="AAAAAA"/><w:left w:val="single" w:sz="2" w:color="AAAAAA"/><w:bottom w:val="single" w:sz="2" w:color="AAAAAA"/><w:right w:val="single" w:sz="2" w:color="AAAAAA"/></w:tcBorders><w:tcMar><w:top w:w="100" w:type="dxa"/><w:bottom w:w="100" w:type="dxa"/><w:left w:w="150" w:type="dxa"/><w:right w:w="150" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:rPr><w:b/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t>'+esc(label)+'</w:t></w:r></w:p></w:tc>'+
+      '<w:tc><w:tcPr><w:tcW w:w="6160" w:type="dxa"/><w:tcBorders><w:top w:val="single" w:sz="2" w:color="AAAAAA"/><w:left w:val="single" w:sz="2" w:color="AAAAAA"/><w:bottom w:val="single" w:sz="2" w:color="AAAAAA"/><w:right w:val="single" w:sz="2" w:color="AAAAAA"/></w:tcBorders><w:tcMar><w:top w:w="100" w:type="dxa"/><w:bottom w:w="100" w:type="dxa"/><w:left w:w="150" w:type="dxa"/><w:right w:w="150" w:type="dxa"/></w:tcMar></w:tcPr><w:p><w:pPr><w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t xml:space="preserve">'+esc(value)+'</w:t></w:r></w:p></w:tc>'+
+    '</w:tr>';
+  }
+  function tabla(label,value){
+    return '<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/><w:tblBorders><w:insideH w:val="none"/><w:insideV w:val="none"/></w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="3200"/><w:gridCol w:w="6160"/></w:tblGrid>'+trow(label,value)+'</w:tbl>';
+  }
+  function firmaCell(nombre,rut,rol){
+    return '<w:tc><w:tcPr><w:tcW w:w="4400" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr>'+
+      '<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:top w:val="single" w:sz="4" w:space="1" w:color="333333"/></w:pBdr><w:spacing w:before="120" w:after="60"/><w:rPr><w:b/><w:sz w:val="18"/><w:szCs w:val="18"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:szCs w:val="18"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t>'+esc(nombre)+'</w:t></w:r></w:p>'+
+      '<w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t>RUT: '+esc(rut)+'</w:t></w:r></w:p>'+
+      '<w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:sz w:val="18"/><w:szCs w:val="18"/><w:color w:val="1B4F72"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:sz w:val="18"/><w:szCs w:val="18"/><w:color w:val="1B4F72"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t>'+esc(rol)+'</w:t></w:r></w:p>'+
+    '</w:tc>';
+  }
+  function spacerCell(){
+    return '<w:tc><w:tcPr><w:tcW w:w="560" w:type="dxa"/><w:tcBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/></w:tcBorders></w:tcPr><w:p><w:pPr><w:rPr><w:sz w:val="18"/></w:rPr></w:pPr></w:p></w:tc>';
+  }
+
+  const cuerpo = [
+    par('CONTRATO DE RESERVA Y COMPROMISO DE COMPRAVENTA',{bold:true,sz:26,color:'1B4F72',center:true,spB:0,spA:60}),
+    par('DE VEHÍCULO MOTORIZADO',{bold:true,sz:24,color:'1B4F72',center:true,spB:0,spA:60}),
+    par('Santiago, '+todayStr,{italic:true,color:'555555',center:true,spB:60,spA:320}),
+    par('En la ciudad de Santiago, a '+todayStr+', las partes que se individualizan a continuación han convenido el presente contrato de reserva y compromiso de compraventa, sujeto a las siguientes condiciones:',{spB:0,spA:240}),
+    sec('I. DATOS DEL VENDEDOR'), sp(),
+    tabla('Razón Social:',vn), tabla('RUT:',vr), tabla('Dirección:',vd), sp(),
+    sec('II. DATOS DEL COMPRADOR'), sp(),
+    tabla('Nombre Completo:',cn), tabla('RUT:',cr), tabla('Dirección:',cd), tabla('Teléfono:',ct), sp(),
+    sec('III. ANTECEDENTES DEL VEHÍCULO'), sp(),
+    tabla('Marca:',marca), tabla('Modelo:',modelo+(anio?' — Año '+anio:'')), tabla('Patente:',patente), tabla('Color:',color), tabla('Kilometraje:',km), sp(),
+    sec('IV. CONDICIONES ECONÓMICAS'), sp(),
+    tabla('Precio Total de Venta:',gcFmt(total)+' ('+gcFmtLetras(total)+' de pesos)'),
+    tabla('Monto de Reserva:',gcFmt(reserva)+' ('+gcFmtLetras(reserva)+' de pesos)'),
+    tabla('Saldo a Pagar:',gcFmt(saldo)+' ('+gcFmtLetras(saldo)+' de pesos)'),
+    tabla('Plazo para Concretar:',plazoStr), sp(),
+    sec('V. CLÁUSULAS Y CONDICIONES'), sp(),
+    parMulti([{text:'1. ',bold:true},{text:'RESERVA: ',bold:true},{text:'El comprador entrega en este acto la suma de '+gcFmt(reserva)+' ('+gcFmtLetras(reserva)+' de pesos) como reserva del vehículo individualizado en la cláusula III, obligándose el vendedor a no ofrecer ni vender dicho vehículo a terceros durante el plazo estipulado.'}]),
+    parMulti([{text:'2. ',bold:true},{text:'PLAZO: ',bold:true},{text:'Las partes acuerdan que la compraventa deberá perfeccionarse a más tardar el día '+plazoStr+', fecha en la cual el comprador deberá pagar el saldo de '+gcFmt(saldo)+' ('+gcFmtLetras(saldo)+' de pesos).'}]),
+    parMulti([{text:'3. ',bold:true},{text:'INCUMPLIMIENTO DEL COMPRADOR: ',bold:true},{text:'Si el comprador no cumpliere con el pago del saldo dentro del plazo establecido, sin causa justificada, el vendedor podrá dejar sin efecto el presente contrato, reteniendo el monto de reserva en calidad de indemnización de perjuicios.'}]),
+    parMulti([{text:'4. ',bold:true},{text:'INCUMPLIMIENTO DEL VENDEDOR: ',bold:true},{text:'Si el vendedor no cumpliere con la entrega del vehículo en las condiciones y plazo pactados, deberá restituir al comprador el doble del monto de reserva recibido, como indemnización por los perjuicios causados.'}]),
+    parMulti([{text:'5. ',bold:true},{text:'ESTADO DEL VEHÍCULO: ',bold:true},{text:'El vendedor declara que el vehículo se encuentra en buen estado de funcionamiento, libre de gravámenes, prohibiciones, prendas, embargos y cualquier otro impedimento legal que afecte su libre transferencia.'}]),
+    parMulti([{text:'6. ',bold:true},{text:'RESOLUCIÓN DE CONFLICTOS: ',bold:true},{text:'Para todos los efectos legales derivados del presente contrato, las partes fijan domicilio en la ciudad de Santiago y se someten a la competencia de sus Tribunales de Justicia.'}]),
+    sp(),sp(),
+    sec('VI. FIRMAS'), sp(),sp(),
+    '<w:tbl><w:tblPr><w:tblW w:w="9360" w:type="dxa"/><w:tblBorders><w:top w:val="none"/><w:left w:val="none"/><w:bottom w:val="none"/><w:right w:val="none"/><w:insideH w:val="none"/><w:insideV w:val="none"/></w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="4400"/><w:gridCol w:w="560"/><w:gridCol w:w="4400"/></w:tblGrid><w:tr>'+firmaCell(vn,vr,'VENDEDOR')+spacerCell()+firmaCell(cn,cr,'COMPRADOR')+'</w:tr></w:tbl>',
+    sp(),sp(),
+    '<w:p><w:pPr><w:jc w:val="center"/><w:pBdr><w:top w:val="single" w:sz="2" w:space="1" w:color="CCCCCC"/></w:pBdr><w:spacing w:before="200" w:after="0"/><w:rPr><w:sz w:val="16"/><w:szCs w:val="16"/><w:color w:val="888888"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="16"/><w:szCs w:val="16"/><w:color w:val="888888"/><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/></w:rPr><w:t>Documento generado el '+esc(todayStr)+'  |  '+esc(vn)+'  |  '+esc(vd)+'</w:t></w:r></w:p>',
+  ].join('\n');
+
+  const xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+    '<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 wp14">'+
+    '<w:body>'+
+    '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1200" w:right="1200" w:bottom="1200" w:left="1200" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr>'+
+    cuerpo+
+    '</w:body></w:document>';
+
+  // Crear ZIP (docx) manualmente usando estructura mínima
+  // Usamos la técnica de RTF como fallback más simple y confiable
+  // Generamos un HTML que Word puede abrir directamente como .doc
+  const htmlDoc = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="UTF-8">
+<style>
+  body { font-family: Arial; font-size: 10pt; margin: 2cm; }
+  h1 { font-size: 13pt; font-weight: bold; color: #1B4F72; text-align: center; margin-bottom: 2px; }
+  h2 { font-size: 12pt; font-weight: bold; color: #1B4F72; text-align: center; margin-bottom: 16px; }
+  .fecha { text-align: center; font-style: italic; color: #555; margin-bottom: 20px; }
+  .intro { text-align: justify; margin-bottom: 20px; }
+  .sec { font-size: 11pt; font-weight: bold; color: #1B4F72; border-bottom: 2px solid #1B4F72; margin: 20px 0 8px; padding-bottom: 3px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 2px; }
+  td { border: 1px solid #aaa; padding: 5px 8px; font-size: 10pt; vertical-align: middle; }
+  td.lbl { background: #E8F0F7; font-weight: bold; width: 34%; }
+  .clausula { text-align: justify; margin: 6px 0; font-size: 10pt; }
+  .firmas { width: 100%; margin-top: 40px; }
+  .firma-box { width: 46%; text-align: center; }
+  .firma-line { border-top: 1px solid #333; padding-top: 6px; font-weight: bold; font-size: 9pt; }
+  .firma-rut { font-size: 9pt; }
+  .firma-rol { font-weight: bold; color: #1B4F72; font-size: 9pt; }
+  .pie { text-align: center; font-size: 8pt; color: #888; border-top: 1px solid #ccc; margin-top: 30px; padding-top: 6px; }
+</style>
+</head>
+<body>
+<h1>CONTRATO DE RESERVA Y COMPROMISO DE COMPRAVENTA</h1>
+<h2>DE VEHÍCULO MOTORIZADO</h2>
+<p class="fecha">Santiago, ${esc(todayStr)}</p>
+<p class="intro">En la ciudad de Santiago, a ${esc(todayStr)}, las partes que se individualizan a continuación han convenido el presente contrato de reserva y compromiso de compraventa, sujeto a las siguientes condiciones:</p>
+
+<div class="sec">I. DATOS DEL VENDEDOR</div>
+<table><tr><td class="lbl">Razón Social:</td><td>${esc(vn)}</td></tr></table>
+<table><tr><td class="lbl">RUT:</td><td>${esc(vr)}</td></tr></table>
+<table><tr><td class="lbl">Dirección:</td><td>${esc(vd)}</td></tr></table>
+
+<div class="sec">II. DATOS DEL COMPRADOR</div>
+<table><tr><td class="lbl">Nombre Completo:</td><td>${esc(cn)}</td></tr></table>
+<table><tr><td class="lbl">RUT:</td><td>${esc(cr)}</td></tr></table>
+<table><tr><td class="lbl">Dirección:</td><td>${esc(cd)}</td></tr></table>
+<table><tr><td class="lbl">Teléfono:</td><td>${esc(ct)}</td></tr></table>
+
+<div class="sec">III. ANTECEDENTES DEL VEHÍCULO</div>
+<table><tr><td class="lbl">Marca:</td><td>${esc(marca)}</td></tr></table>
+<table><tr><td class="lbl">Modelo:</td><td>${esc(modelo)+(anio?' — Año '+esc(anio):'')}</td></tr></table>
+<table><tr><td class="lbl">Patente:</td><td>${esc(patente)}</td></tr></table>
+<table><tr><td class="lbl">Color:</td><td>${esc(color)}</td></tr></table>
+<table><tr><td class="lbl">Kilometraje:</td><td>${esc(km)}</td></tr></table>
+
+<div class="sec">IV. CONDICIONES ECONÓMICAS</div>
+<table><tr><td class="lbl">Precio Total de Venta:</td><td>${gcFmt(total)} (${gcFmtLetras(total)} de pesos)</td></tr></table>
+<table><tr><td class="lbl">Monto de Reserva:</td><td>${gcFmt(reserva)} (${gcFmtLetras(reserva)} de pesos)</td></tr></table>
+<table><tr><td class="lbl">Saldo a Pagar:</td><td>${gcFmt(saldo)} (${gcFmtLetras(saldo)} de pesos)</td></tr></table>
+<table><tr><td class="lbl">Plazo para Concretar:</td><td>${esc(plazoStr)}</td></tr></table>
+
+<div class="sec">V. CLÁUSULAS Y CONDICIONES</div>
+<p class="clausula"><b>1. RESERVA:</b> El comprador entrega en este acto la suma de ${gcFmt(reserva)} (${gcFmtLetras(reserva)} de pesos) como reserva del vehículo individualizado en la cláusula III, obligándose el vendedor a no ofrecer ni vender dicho vehículo a terceros durante el plazo estipulado.</p>
+<p class="clausula"><b>2. PLAZO:</b> Las partes acuerdan que la compraventa deberá perfeccionarse a más tardar el día ${esc(plazoStr)}, fecha en la cual el comprador deberá pagar el saldo de ${gcFmt(saldo)} (${gcFmtLetras(saldo)} de pesos).</p>
+<p class="clausula"><b>3. INCUMPLIMIENTO DEL COMPRADOR:</b> Si el comprador no cumpliere con el pago del saldo dentro del plazo establecido, sin causa justificada, el vendedor podrá dejar sin efecto el presente contrato, reteniendo el monto de reserva en calidad de indemnización de perjuicios.</p>
+<p class="clausula"><b>4. INCUMPLIMIENTO DEL VENDEDOR:</b> Si el vendedor no cumpliere con la entrega del vehículo en las condiciones y plazo pactados, deberá restituir al comprador el doble del monto de reserva recibido, como indemnización por los perjuicios causados.</p>
+<p class="clausula"><b>5. ESTADO DEL VEHÍCULO:</b> El vendedor declara que el vehículo se encuentra en buen estado de funcionamiento, libre de gravámenes, prohibiciones, prendas, embargos y cualquier otro impedimento legal que afecte su libre transferencia.</p>
+<p class="clausula"><b>6. RESOLUCIÓN DE CONFLICTOS:</b> Para todos los efectos legales derivados del presente contrato, las partes fijan domicilio en la ciudad de Santiago y se someten a la competencia de sus Tribunales de Justicia.</p>
+
+<div class="sec">VI. FIRMAS</div>
+<br><br>
+<table class="firmas"><tr>
+  <td class="firma-box"><div class="firma-line">${esc(vn)}</div><div class="firma-rut">RUT: ${esc(vr)}</div><div class="firma-rol">VENDEDOR</div></td>
+  <td style="width:8%; border:none;"></td>
+  <td class="firma-box"><div class="firma-line">${esc(cn)}</div><div class="firma-rut">RUT: ${esc(cr)}</div><div class="firma-rol">COMPRADOR</div></td>
+</tr></table>
+
+<p class="pie">Documento generado el ${esc(todayStr)} | ${esc(vn)} | ${esc(vd)}</p>
+</body></html>`;
+
+  const blob = new Blob([htmlDoc], {type: 'application/msword;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Contrato_'+cn.split(' ')[0]+'_'+marca+'_'+modelo+'.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  status.textContent = '✅ Contrato descargado correctamente. Se abre con Word o Google Docs.';
 }
 </script>
-<script src="https://unpkg.com/docx@9.6.1/build/index.js"></script>
 </body>
 </html>
